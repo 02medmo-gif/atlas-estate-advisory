@@ -125,11 +125,11 @@ function serveStatic(request, response) {
 }
 
 const server = http.createServer((request, response) => {
-  if (request.url === "/healthz") {
+  if (request.url === "/healthz" || request.url === "/status") {
     sendJson(response, 200, { ok: true });
     return;
   }
-  if (request.url.startsWith("/api/lead")) {
+  if (request.url.startsWith("/api/consultation") || request.url.startsWith("/api/lead")) {
     handleLead(request, response);
     return;
   }
