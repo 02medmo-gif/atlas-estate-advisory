@@ -13,13 +13,13 @@ form?.addEventListener("submit", async (event) => {
   submitButton.disabled = true;
 
   try {
-    const response = await fetch("/api/lead", {
+    const response = await fetch("/api/consultation", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
 
-    if (!response.ok) throw new Error("Lead endpoint unavailable");
+    if (!response.ok) throw new Error("Consultation endpoint unavailable");
 
     statusMessage.textContent = name
       ? `Merci ${name}. Votre demande a bien ete recue. Nous reviendrons vers vous pour organiser un echange confidentiel.`
