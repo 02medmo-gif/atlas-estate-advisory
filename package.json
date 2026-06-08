@@ -1,0 +1,12 @@
+{
+  "name": "atlas-estate-advisory",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Landing page and lead backend for Atlas Estate Advisory.",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
