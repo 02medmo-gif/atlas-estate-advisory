@@ -12,6 +12,7 @@ const DATA_DIR = path.join(ROOT, "data");
 const LEADS_FILE = path.join(DATA_DIR, "leads.jsonl");
 const MAX_BODY_BYTES = 24 * 1024;
 const LEAD_WEBHOOK_URL = process.env.LEAD_WEBHOOK_URL || "";
+const ADMIN_TOKEN = process.env.ADMIN_TOKEN || "";
 
 const contentTypes = {
   ".html": "text/html; charset=utf-8",
@@ -70,6 +71,33 @@ function collectBody(request) {
   });
 }
 
+function readLeads() {
+  if (!fs.existsSync(LEADS_FILE)) {
+    return [];
+  }
+
+  const lines = fs.readFileSync(LEADS_FILE, "utf8").split("\n").filter(Boolean);
+  return lines
+    .map((line) => {
+      try {
+        return JSON.parse(line);
+      } catch {
+        return null;
+      }
+    })
+    .filter(Boolean)
+    .reverse();
+}
+
+function isAdminAuthorized(requestUrl) {
+  if (!ADMIN_TOKEN) {
+    return true;
+  }
+
+  const url = new URL(requestUrl, "http://localhost");
+  return url.searchParams.get("token") === ADMIN_TOKEN;
+}
+
 async function handleLead(request, response) {
   if (request.method !== "POST") {
     sendJson(response, 405, { ok: false, error: "Method not allowed" });
@@ -93,7 +121,9 @@ async function handleLead(request, response) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(result.lead),
-      }).catch((error) => console.error("Lead webhook failed:", error.message));
+      }).catch((error) => {
+        console.error("Lead webhook failed:", error.message);
+      });
     }
 
     sendJson(response, 200, { ok: true, id: result.lead.id });
@@ -119,20 +149,49 @@ function serveStatic(request, response) {
       response.end("Not found");
       return;
     }
-    response.writeHead(200, { "Content-Type": contentTypes[path.extname(filePath)] || "application/octet-stream" });
+
+    response.writeHead(200, {
+      "Content-Type": contentTypes[path.extname(filePath)] || "application/octet-stream",
+    });
     response.end(data);
   });
 }
 
 const server = http.createServer((request, response) => {
+  if (request.url.startsWith("/api/leads")) {
+    if (!isAdminAuthorized(request.url)) {
+      sendJson(response, 401, { ok: false, error: "Unauthorized" });
+      return;
+    }
+
+    sendJson(response, 200, { ok: true, leads: readLeads() });
+    return;
+  }
+
   if (request.url === "/healthz" || request.url === "/status") {
     sendJson(response, 200, { ok: true });
     return;
   }
+
+  if (request.url.startsWith("/admin")) {
+    const adminPath = path.join(ROOT, "admin.html");
+    fs.readFile(adminPath, (error, data) => {
+      if (error) {
+        response.writeHead(404);
+        response.end("Not found");
+        return;
+      }
+      response.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+      response.end(data);
+    });
+    return;
+  }
+
   if (request.url.startsWith("/api/consultation") || request.url.startsWith("/api/lead")) {
     handleLead(request, response);
     return;
   }
+
   serveStatic(request, response);
 });
 
