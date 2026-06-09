@@ -13,9 +13,9 @@ function tokenQuery() {
 
 function renderRows(leads) {
   leadCount.textContent = String(leads.length);
-  latestDate.textContent = leads[0]?.createdAt ? new Date(leads[0].createdAt).toLocaleString("fr-FR") : "—";
+  latestDate.textContent = leads[0]?.createdAt ? new Date(leads[0].createdAt).toLocaleString("fr-FR") : "-";
   if (!leads.length) {
-    leadsBody.innerHTML = "<tr><td colspan=\"9\">Aucune demande pour le moment.</td></tr>";
+    leadsBody.innerHTML = "<tr><td colspan=\"10\">Aucune demande pour le moment.</td></tr>";
     return;
   }
 
@@ -31,6 +31,7 @@ function renderRows(leads) {
           <td>${lead.target || ""}</td>
           <td>${lead.budget || ""}</td>
           <td>${lead.goal || ""}</td>
+          <td>${lead.sheetsStatus || ""}</td>
           <td class="message-cell">${lead.message || ""}</td>
         </tr>
       `,
@@ -40,7 +41,7 @@ function renderRows(leads) {
 
 async function loadLeads() {
   statusEl.textContent = "Chargement des demandes...";
-  leadsBody.innerHTML = "<tr><td colspan=\"9\">Chargement...</td></tr>";
+  leadsBody.innerHTML = "<tr><td colspan=\"10\">Chargement...</td></tr>";
 
   const response = await fetch(`/api/leads${tokenQuery()}`, {
     headers: { Accept: "application/json" },
@@ -49,11 +50,11 @@ async function loadLeads() {
   const data = await response.json();
   if (!response.ok) {
     statusEl.textContent = data.error || "Impossible de charger les demandes.";
-    leadsBody.innerHTML = "<tr><td colspan=\"9\">Accès refusé ou données indisponibles.</td></tr>";
+    leadsBody.innerHTML = "<tr><td colspan=\"10\">Acces refuse ou donnees indisponibles.</td></tr>";
     return;
   }
 
-  statusEl.textContent = `Demandes chargées: ${data.leads.length}`;
+  statusEl.textContent = `Demandes chargees: ${data.leads.length}`;
   renderRows(data.leads || []);
 }
 
