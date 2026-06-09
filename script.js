@@ -5,6 +5,7 @@ const recipientEmail = "02medmo@gmail.com";
 form?.addEventListener("submit", async (event) => {
   event.preventDefault();
   const submitButton = form.querySelector("button[type='submit']");
+
   const formData = new FormData(form);
   const name = String(formData.get("name") || "").trim();
   const payload = Object.fromEntries(formData.entries());
@@ -19,11 +20,20 @@ form?.addEventListener("submit", async (event) => {
       body: JSON.stringify(payload),
     });
 
-    if (!response.ok) throw new Error("Consultation endpoint unavailable");
+    if (!response.ok) {
+      throw new Error("Lead endpoint unavailable");
+    }
+
+    const result = await response.json();
+    const sheetsWarning = result.storage && !result.storage.googleSheets
+      ? " La demande est sauvegardee en interne; synchronisation Google Sheets a verifier."
+      : "";
 
     statusMessage.textContent = name
       ? `Merci ${name}. Votre demande a bien ete recue. Nous reviendrons vers vous pour organiser un echange confidentiel.`
       : "Votre demande a bien ete recue. Nous reviendrons vers vous pour organiser un echange confidentiel.";
+    statusMessage.textContent += sheetsWarning;
+
     form.reset();
   } catch (error) {
     const details = [
@@ -35,12 +45,16 @@ form?.addEventListener("submit", async (event) => {
       ["Budget estime", formData.get("budget")],
       ["Objectif", formData.get("goal")],
       ["Message", formData.get("message")],
-    ].map(([label, value]) => `${label}: ${String(value || "").trim()}`).join("\n");
+    ]
+      .map(([label, value]) => `${label}: ${String(value || "").trim()}`)
+      .join("\n");
 
     const subject = encodeURIComponent("Nouvelle demande - Atlas Estate Advisory");
     const body = encodeURIComponent(details);
     window.location.href = `mailto:${recipientEmail}?subject=${subject}&body=${body}`;
-    statusMessage.textContent = "Le serveur n'est pas disponible. Un email prerempli va s'ouvrir pour transmettre votre demande.";
+
+    statusMessage.textContent =
+      "Le serveur n'est pas disponible. Un email prerempli va s'ouvrir pour transmettre votre demande.";
   } finally {
     submitButton.disabled = false;
   }
