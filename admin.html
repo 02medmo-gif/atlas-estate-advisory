@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Atlas Estate Advisory | Leads</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./styles.css">
+    <style>
+      body.admin-shell { background: linear-gradient(180deg, #f7f1e5 0%, #fcfaf5 100%); }
+      .admin-page { width: min(1240px, calc(100% - 36px)); margin: 0 auto; padding: 36px 0 52px; }
+      .admin-hero { display: grid; grid-template-columns: 1.5fr 1fr; gap: 28px; align-items: end; padding: 28px; border: 1px solid rgba(19,33,29,.14); background: rgba(255,255,255,.72); box-shadow: 0 24px 60px rgba(13,35,30,.14); }
+      .admin-lead { max-width: 64ch; margin: 16px 0 0; color: #65716b; }
+      .admin-token label { display: block; margin-bottom: 8px; font-size: .82rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+      .admin-token-row { display: flex; gap: 10px; }
+      .admin-token-row input { flex: 1; }
+      .admin-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 18px; }
+      .admin-summary article, .admin-table-wrap { border: 1px solid rgba(19,33,29,.14); background: #fffdf8; box-shadow: 0 24px 60px rgba(13,35,30,.14); }
+      .admin-summary article { padding: 20px; }
+      .admin-summary span { display: block; color: #65716b; font-size: .78rem; text-transform: uppercase; letter-spacing: .1em; }
+      .admin-summary strong { display: block; margin-top: 10px; font-family: "Libre Baskerville", Georgia, serif; font-size: 2rem; line-height: 1.1; }
+      .admin-summary p { margin: 8px 0 0; color: #65716b; }
+      .admin-table-wrap { margin-top: 18px; overflow: hidden; }
+      .admin-table-head { display: flex; justify-content: space-between; gap: 16px; align-items: center; padding: 20px 22px 0; }
+      .admin-table-head h2 { font-size: 1.35rem; margin: 0; }
+      .admin-table-scroll { overflow: auto; margin-top: 16px; }
+      .admin-table { width: 100%; border-collapse: collapse; min-width: 1100px; }
+      .admin-table th, .admin-table td { padding: 14px 16px; border-top: 1px solid rgba(19,33,29,.14); vertical-align: top; text-align: left; }
+      .admin-table th { position: sticky; top: 0; background: #f7f1e5; z-index: 1; font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; }
+      .message-cell { max-width: 320px; }
+      @media (max-width: 960px) { .admin-hero, .admin-summary { grid-template-columns: 1fr; } .admin-token-row { flex-direction: column; } }
+      @media (max-width: 720px) { .admin-table-head { flex-direction: column; align-items: flex-start; } }
+    </style>
+  </head>
+  <body class="admin-shell">
+    <main class="admin-page">
+      <section class="admin-hero">
+        <div>
+          <p class="eyebrow dark">Back office</p>
+          <h1>Demandes reçues</h1>
+          <p class="admin-lead">Vue simple pour suivre les demandes, vérifier le contexte et relancer rapidement.</p>
+        </div>
+        <form class="admin-token" id="token-form">
+          <label for="admin-token">Token admin</label>
+          <div class="admin-token-row">
+            <input id="admin-token" name="token" type="password" placeholder="Token d'accès">
+            <button class="button button-primary" type="submit">Charger</button>
+          </div>
+          <p class="form-status" id="admin-status" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <section class="admin-summary">
+        <article>
+          <span>Boîte</span>
+          <strong id="lead-count">0</strong>
+          <p>Demandes enregistrées</p>
+        </article>
+        <article>
+          <span>Dernière</span>
+          <strong id="latest-date">—</strong>
+          <p>Soumission la plus récente</p>
+        </article>
+        <article>
+          <span>Canal</span>
+          <strong>Formulaire</strong>
+          <p>Atlas Estate Advisory</p>
+        </article>
+      </section>
+
+      <section class="admin-table-wrap">
+        <div class="admin-table-head">
+          <h2>Liste des leads</h2>
+          <button class="text-link" id="refresh-btn" type="button">Actualiser</button>
+        </div>
+        <div class="admin-table-scroll">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Nom</th>
+                <th>Email</th>
+                <th>Téléphone</th>
+                <th>Pays</th>
+                <th>Cible</th>
+                <th>Budget</th>
+                <th>Objectif</th>
+                <th>Message</th>
+              </tr>
+            </thead>
+            <tbody id="leads-body">
+              <tr><td colspan="9">Chargement...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script src="./admin.js"></script>
+  </body>
+</html>
