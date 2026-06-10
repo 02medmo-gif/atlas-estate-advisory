@@ -2,6 +2,13 @@ const form = document.querySelector("#lead-form");
 const statusMessage = document.querySelector("#form-status");
 const recipientEmail = "02medmo@gmail.com";
 
+if (!document.querySelector('link[href$="modern.css"]')) {
+  const modernStyles = document.createElement("link");
+  modernStyles.rel = "stylesheet";
+  modernStyles.href = "./modern.css";
+  document.head.append(modernStyles);
+}
+
 form?.addEventListener("submit", async (event) => {
   event.preventDefault();
   const submitButton = form.querySelector("button[type='submit']");
