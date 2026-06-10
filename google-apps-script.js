@@ -1,6 +1,11 @@
 const SHEET_ID = "1DoQMINip1IKCb09yNZUNcJd3i6bPJHWnxOlyf4JWgi4";
 const SHEET_NAME = "Leads";
 
+function asSheetText(value) {
+  const cleanValue = String(value || "").replace(/^'+/, "");
+  return cleanValue ? `'${cleanValue}` : "";
+}
+
 function doPost(e) {
   const payload = JSON.parse(e.postData.contents || "{}");
   const sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(SHEET_NAME);
@@ -9,7 +14,7 @@ function doPost(e) {
     payload.createdAt ? new Date(payload.createdAt) : new Date(),
     payload.name || "",
     payload.email || "",
-    payload.phone || "",
+    asSheetText(payload.phone),
     payload.residence || "",
     payload.target || "",
     payload.budget || "",
