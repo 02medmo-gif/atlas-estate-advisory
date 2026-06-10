@@ -356,6 +356,54 @@ nav a:hover::after,
   backdrop-filter: blur(16px);
 }
 
+.booking-gate {
+  margin-bottom: 24px;
+  padding: 22px;
+  border: 1px solid rgba(197, 162, 91, .34);
+  border-radius: 22px;
+  background: linear-gradient(145deg, rgba(255, 253, 248, .92), rgba(244, 235, 215, .58));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .55);
+}
+
+.booking-gate h3 {
+  margin-bottom: 10px;
+  font-family: var(--serif);
+  font-size: clamp(1.2rem, 2vw, 1.55rem);
+}
+
+.booking-gate p:not(.eyebrow) {
+  margin: 0 0 12px;
+  color: var(--muted);
+}
+
+.calendly-inline-link {
+  margin-bottom: 16px;
+}
+
+.checkbox-field {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 12px;
+  align-items: start;
+  margin-top: 10px;
+  color: #263730;
+  cursor: pointer;
+}
+
+.checkbox-field input {
+  width: 19px;
+  height: 19px;
+  min-height: 19px;
+  padding: 0;
+  margin: 3px 0 0;
+  accent-color: var(--gold);
+  cursor: pointer;
+}
+
+.checkbox-field span {
+  line-height: 1.45;
+}
+
 input,
 select,
 textarea {
@@ -456,4 +504,11 @@ textarea:focus {
   .destination-grid article {
     min-height: 300px;
   }
+}
+
+.form-button:disabled {
+  opacity: .54;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none;
 }
