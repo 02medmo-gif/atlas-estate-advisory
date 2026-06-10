@@ -1,6 +1,8 @@
 const form = document.querySelector("#lead-form");
 const statusMessage = document.querySelector("#form-status");
 const recipientEmail = "02medmo@gmail.com";
+const calendlyCheckbox = document.querySelector("#calendly-confirmed");
+const formSubmitButton = form?.querySelector("button[type='submit']");
 
 if (!document.querySelector('link[href$="modern.css"]')) {
   const modernStyles = document.createElement("link");
@@ -9,13 +11,44 @@ if (!document.querySelector('link[href$="modern.css"]')) {
   document.head.append(modernStyles);
 }
 
+function isCalendlyConfirmed() {
+  return Boolean(calendlyCheckbox?.checked);
+}
+
+function updateSubmitAvailability() {
+  if (!formSubmitButton || !calendlyCheckbox) {
+    return;
+  }
+
+  formSubmitButton.disabled = !isCalendlyConfirmed();
+}
+
+calendlyCheckbox?.addEventListener("change", () => {
+  updateSubmitAvailability();
+
+  if (isCalendlyConfirmed()) {
+    statusMessage.textContent = "";
+  }
+});
+
+updateSubmitAvailability();
+
 form?.addEventListener("submit", async (event) => {
   event.preventDefault();
-  const submitButton = form.querySelector("button[type='submit']");
+  const submitButton = formSubmitButton || form.querySelector("button[type='submit']");
+
+  if (!isCalendlyConfirmed()) {
+    statusMessage.textContent =
+      "Veuillez d'abord réserver une consultation sur Calendly, puis confirmer cette réservation avant d'envoyer votre demande.";
+    calendlyCheckbox?.focus();
+    updateSubmitAvailability();
+    return;
+  }
 
   const formData = new FormData(form);
   const name = String(formData.get("name") || "").trim();
   const payload = Object.fromEntries(formData.entries());
+  payload.calendlyConfirmed = "yes";
 
   statusMessage.textContent = "Envoi en cours...";
   submitButton.disabled = true;
@@ -27,13 +60,21 @@ form?.addEventListener("submit", async (event) => {
       body: JSON.stringify(payload),
     });
 
+    const result = await response.json().catch(() => ({}));
+
     if (!response.ok) {
+      if (response.status === 400 && result.error === "Calendly booking confirmation is required") {
+        statusMessage.textContent =
+          "La réservation Calendly doit être confirmée avant l'envoi du formulaire.";
+        updateSubmitAvailability();
+        return;
+      }
+
       throw new Error("Lead endpoint unavailable");
     }
 
-    const result = await response.json();
     const sheetsWarning = result.storage && !result.storage.googleSheets
-      ? " La demande est sauvegardee en interne; synchronisation Google Sheets a verifier."
+      ? " La demande est sauvegardée en interne ; la synchronisation Google Sheets est à vérifier."
       : "";
 
     statusMessage.textContent = name
@@ -46,11 +87,12 @@ form?.addEventListener("submit", async (event) => {
     const details = [
       ["Nom complet", formData.get("name")],
       ["Email", formData.get("email")],
-      ["Telephone / WhatsApp", formData.get("phone")],
-      ["Pays de residence", formData.get("residence")],
+      ["Téléphone / WhatsApp", formData.get("phone")],
+      ["Pays de résidence", formData.get("residence")],
       ["Pays cible", formData.get("target")],
-      ["Budget estime", formData.get("budget")],
+      ["Budget estimé", formData.get("budget")],
       ["Objectif", formData.get("goal")],
+      ["Réservation Calendly", formData.get("calendlyConfirmed") ? "Confirmée" : "Non confirmée"],
       ["Message", formData.get("message")],
     ]
       .map(([label, value]) => `${label}: ${String(value || "").trim()}`)
@@ -63,7 +105,7 @@ form?.addEventListener("submit", async (event) => {
     statusMessage.textContent =
       "Le serveur n'est pas disponible. Un email pr\u00e9rempli va s'ouvrir pour transmettre votre demande.";
   } finally {
-    submitButton.disabled = false;
+    updateSubmitAvailability();
   }
 });
 
