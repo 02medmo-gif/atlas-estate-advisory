@@ -1,3 +1,6 @@
 data/
 node_modules/
 .env
+atlas-estate-advisory-leads.xlsx
+build-leads-sheet.mjs
+help-spreadsheet.mjs
