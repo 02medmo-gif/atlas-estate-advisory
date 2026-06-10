@@ -66,10 +66,10 @@ Columns:
 Fecha y hora
 Nom complet
 Email
-Telephone / WhatsApp
-Pays de residence
+Téléphone / WhatsApp
+Pays de résidence
 Pays cible
-Budget estime
+Budget estimé
 Objectif
 Message libre
 ```
@@ -83,9 +83,8 @@ Message libre
 5. Type: Web app.
 6. Execute as: Me.
 7. Who has access: Anyone.
-8. Authorize the script. Google may show "Google hasn't verified this app" because this is a private script in your own account; choose Advanced only if you trust this project.
-9. Copy the Web App URL ending in `/exec`.
-10. In Render, set:
+8. Copy the Web App URL ending in `/exec`.
+9. In Render, set:
 
 ```text
 GOOGLE_SHEETS_WEBHOOK_URL=your-web-app-url
@@ -106,6 +105,18 @@ The panel reads from:
 ```text
 GET /api/leads?token=YOUR_ADMIN_TOKEN
 ```
+
+## Calendly gate
+
+The public form requires the visitor to confirm that a private Calendly consultation has been booked.
+This is enforced in two places:
+
+```text
+Frontend: required checkbox before enabling submit
+Backend: POST /api/consultation rejects missing calendlyConfirmed
+```
+
+For automatic verification of real bookings, add a Calendly webhook or API integration later.
 
 ## Fallback
 
