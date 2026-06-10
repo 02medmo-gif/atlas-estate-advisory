@@ -38,6 +38,10 @@ function sanitizeText(value, maxLength = 1000) {
     .slice(0, maxLength);
 }
 
+function isConfirmed(value) {
+  return value === true || value === "true" || value === "yes" || value === "on" || value === "1";
+}
+
 function validateLead(payload) {
   const lead = {
     id: crypto.randomUUID(),
@@ -50,6 +54,7 @@ function validateLead(payload) {
     budget: sanitizeText(payload.budget, 80),
     goal: sanitizeText(payload.goal, 120),
     message: sanitizeText(payload.message, 1800),
+    calendlyConfirmed: isConfirmed(payload.calendlyConfirmed),
   };
 
   const missing = ["name", "email", "phone", "residence", "target", "budget", "goal"].filter(
@@ -62,6 +67,10 @@ function validateLead(payload) {
 
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(lead.email)) {
     return { error: "Invalid email address" };
+  }
+
+  if (!lead.calendlyConfirmed) {
+    return { error: "Calendly booking confirmation is required" };
   }
 
   return { lead };
