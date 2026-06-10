@@ -114,6 +114,10 @@ function adminIsConfigured() {
   return Boolean(ADMIN_TOKEN);
 }
 
+function asGoogleSheetsText(value) {
+  return value ? `'${value}` : "";
+}
+
 async function postJsonWithTimeout(url, payload, timeoutMs = 8000) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
@@ -147,7 +151,7 @@ async function syncLeadToGoogleSheets(lead) {
       createdAt: lead.createdAt,
       name: lead.name,
       email: lead.email,
-      phone: lead.phone,
+      phone: asGoogleSheetsText(lead.phone),
       residence: lead.residence,
       target: lead.target,
       budget: lead.budget,
