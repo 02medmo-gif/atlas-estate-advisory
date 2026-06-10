@@ -83,8 +83,9 @@ Message libre
 5. Type: Web app.
 6. Execute as: Me.
 7. Who has access: Anyone.
-8. Copy the Web App URL ending in `/exec`.
-9. In Render, set:
+8. Authorize the script. Google may show "Google hasn't verified this app" because this is a private script in your own account; choose Advanced only if you trust this project.
+9. Copy the Web App URL ending in `/exec`.
+10. In Render, set:
 
 ```text
 GOOGLE_SHEETS_WEBHOOK_URL=your-web-app-url
